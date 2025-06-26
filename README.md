@@ -97,6 +97,71 @@ export ANTHROPIC_API_KEY="your-anthropic-key"
 export REDIS_URL="redis://localhost:6379"
 ```
 
+## 🔒 **Privacy & Data Protection**
+
+Architex is built with **privacy-first principles** and provides comprehensive data protection controls.
+
+### **Privacy by Design**
+
+- **Local-First Processing**: All analysis happens locally by default
+- **No Data Transmission**: No code is sent to external services unless explicitly enabled
+- **Consent-Based AI**: AI features require explicit user consent
+- **Data Minimization**: Only collects data necessary for analysis
+- **Automatic Cleanup**: Configurable data retention and cleanup policies
+
+### **Privacy Controls**
+
+```bash
+# View current privacy settings
+architex privacy
+
+# Configure privacy settings
+architex privacy-settings --local-only --ai-enabled false
+
+# Manage consent for features
+architex consent ai_analysis --grant
+architex consent file_watching --revoke
+
+# Generate privacy report
+architex privacy-report --output privacy_report.json
+
+# Clean up cached data
+architex cleanup
+```
+
+### **Key Privacy Features**
+
+- **Sensitive File Exclusion**: Automatically excludes `.env`, `*.key`, `secrets.json`, etc.
+- **Gitignore Respect**: Follows `.gitignore` patterns for file analysis
+- **Code Anonymization**: Removes sensitive data before AI processing
+- **Granular Consent**: Control consent for different features independently
+- **Data Retention Policies**: Configurable cleanup and retention settings
+
+### **Privacy Configuration**
+
+```yaml
+privacy:
+  data_handling:
+    local_only: true              # Process locally only
+    store_analyzed_code: false    # Don't persist code
+    store_ai_responses: false     # Don't store AI responses
+    clear_cache_on_exit: true     # Auto-cleanup
+  
+  ai_features:
+    enabled: false                # AI disabled by default
+    require_consent: true         # Require explicit consent
+    anonymize_code_before_ai: true # Anonymize before AI
+  
+  file_watching:
+    respect_gitignore: true       # Follow .gitignore
+    exclude_sensitive_patterns:   # Skip sensitive files
+      - "*.env"
+      - "*.key"
+      - "secrets.json"
+```
+
+For detailed privacy information, see [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
+
 ## 🚀 **Quick Start**
 
 ### **Basic Analysis with AI**

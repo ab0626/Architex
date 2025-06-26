@@ -284,4 +284,80 @@ development:
   testing:
     use_mock_llm: true
     test_data_dir: "test_data"
-    coverage_threshold: 80 
+    coverage_threshold: 80
+
+# Privacy and Data Protection Configuration
+privacy:
+  # Data handling settings
+  data_handling:
+    local_only: true
+    store_analyzed_code: false
+    store_ai_responses: false
+    clear_cache_on_exit: true
+    anonymize_code_before_ai: true
+  
+  # AI features privacy controls
+  ai_features:
+    enabled: false  # Disabled by default for privacy
+    require_consent: true
+    consent_prompt: true
+    data_minimization: true
+  
+  # File watching privacy
+  file_watching:
+    enabled: true
+    respect_gitignore: true
+    exclude_sensitive_patterns:
+      - "*.key"
+      - "*.pem"
+      - "*.p12"
+      - "*.pfx"
+      - "*.env"
+      - ".env*"
+      - "config.local.*"
+      - "*.db"
+      - "*.sqlite"
+      - "*.sqlite3"
+      - "secrets.json"
+      - "credentials.json"
+      - "*.log"
+      - "logs/"
+      - "node_modules/"
+      - "venv/"
+      - "env/"
+      - ".git/"
+      - ".svn/"
+      - ".hg/"
+  
+  # Web interface privacy
+  web_interface:
+    websocket_enabled: false
+    require_authentication: true
+    local_only: true
+    max_clients: 10
+  
+  # Data retention policies
+  data_retention:
+    max_cache_age_hours: 24
+    max_log_retention_days: 7
+    auto_cleanup: true
+    cleanup_on_exit: true
+  
+  # Consent management
+  consent:
+    require_explicit_consent: true
+    consent_file: ".architex_consent.json"
+    consent_expiry_days: 365
+    granular_consent: true
+    consent_features:
+      - "ai_analysis"
+      - "file_watching"
+      - "web_interface"
+      - "data_storage"
+  
+  # Privacy reporting
+  reporting:
+    generate_privacy_report: true
+    export_privacy_settings: false
+    privacy_log_level: "INFO"
+    audit_trail: false 

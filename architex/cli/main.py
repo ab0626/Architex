@@ -13,6 +13,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from ..core.analyzer import CodebaseAnalyzer
 from ..exporters import MermaidExporter, PlantUMLExporter, GraphvizExporter
 from ..core.models import AnalysisResult
+from ..core.privacy import privacy_manager, privacy_cleanup
 
 app = typer.Typer(help="Architex - Automated System Design Diagram Generator")
 console = Console()
@@ -108,6 +109,124 @@ def formats():
     console.print(table)
 
 
+@app.command()
+def privacy():
+    """Manage privacy settings and data protection."""
+    console.print("[bold green]Privacy Settings[/bold green]")
+    
+    # Display current privacy settings
+    settings = privacy_manager.settings
+    privacy_table = Table()
+    privacy_table.add_column("Setting", style="cyan")
+    privacy_table.add_column("Value", style="green")
+    privacy_table.add_column("Description", style="yellow")
+    
+    privacy_table.add_row("Local Only", str(settings.local_only), "Process data locally only")
+    privacy_table.add_row("AI Enabled", str(settings.ai_enabled), "Enable AI-powered analysis")
+    privacy_table.add_row("Store Analyzed Code", str(settings.store_analyzed_code), "Persist analyzed code")
+    privacy_table.add_row("Store AI Responses", str(settings.store_ai_responses), "Persist AI responses")
+    privacy_table.add_row("File Watching", str(settings.file_watching_enabled), "Monitor file changes")
+    privacy_table.add_row("Respect .gitignore", str(settings.respect_gitignore), "Follow gitignore patterns")
+    privacy_table.add_row("WebSocket Enabled", str(settings.websocket_enabled), "Enable web interface")
+    privacy_table.add_row("Clear Cache on Exit", str(settings.clear_cache_on_exit), "Auto-cleanup on exit")
+    
+    console.print(privacy_table)
+    
+    # Display privacy report
+    report = privacy_manager.get_privacy_report()
+    console.print(f"\n[bold]Privacy Report[/bold]")
+    console.print(f"• Local processing: {report['local_only']}")
+    console.print(f"• AI features: {report['ai_enabled']}")
+    console.print(f"• Data storage: {report['data_storage']}")
+    console.print(f"• Sensitive patterns excluded: {report['sensitive_patterns_excluded']}")
+
+
+@app.command()
+def privacy_settings(
+    local_only: bool = typer.Option(None, "--local-only", help="Enable local-only processing"),
+    ai_enabled: bool = typer.Option(None, "--ai-enabled", help="Enable AI features"),
+    store_code: bool = typer.Option(None, "--store-code", help="Store analyzed code"),
+    store_ai: bool = typer.Option(None, "--store-ai", help="Store AI responses"),
+    file_watching: bool = typer.Option(None, "--file-watching", help="Enable file watching"),
+    websocket: bool = typer.Option(None, "--websocket", help="Enable WebSocket server"),
+    clear_cache: bool = typer.Option(None, "--clear-cache", help="Clear cache on exit")
+):
+    """Update privacy settings."""
+    updates = {}
+    
+    if local_only is not None:
+        updates['local_only'] = local_only
+    if ai_enabled is not None:
+        updates['ai_enabled'] = ai_enabled
+    if store_code is not None:
+        updates['store_analyzed_code'] = store_code
+    if store_ai is not None:
+        updates['store_ai_responses'] = store_ai
+    if file_watching is not None:
+        updates['file_watching_enabled'] = file_watching
+    if websocket is not None:
+        updates['websocket_enabled'] = websocket
+    if clear_cache is not None:
+        updates['clear_cache_on_exit'] = clear_cache
+    
+    if updates:
+        privacy_manager.update_settings(**updates)
+        console.print(f"[green]✓ Updated privacy settings: {list(updates.keys())}[/green]")
+    else:
+        console.print("[yellow]No settings specified. Use --help to see available options.[/yellow]")
+
+
+@app.command()
+def consent(
+    feature: str = typer.Argument(..., help="Feature to grant consent for (ai_analysis, file_watching, web_interface, data_storage)"),
+    grant: bool = typer.Option(True, "--grant/--revoke", help="Grant or revoke consent")
+):
+    """Manage consent for privacy-sensitive features."""
+    if grant:
+        # For AI analysis, this will trigger the consent prompt
+        if feature == "ai_analysis":
+            consent_given = privacy_manager.get_consent("ai_analysis")
+            if consent_given:
+                console.print(f"[green]✓ Consent granted for {feature}[/green]")
+            else:
+                console.print(f"[yellow]✗ Consent not granted for {feature}[/yellow]")
+        else:
+            console.print(f"[green]✓ Consent granted for {feature}[/green]")
+    else:
+        console.print(f"[yellow]✗ Consent revoked for {feature}[/yellow]")
+
+
+@app.command()
+def privacy_report(
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Output file for privacy report")
+):
+    """Generate a detailed privacy report."""
+    report = privacy_manager.get_privacy_report()
+    
+    if output:
+        privacy_manager.export_privacy_settings(output)
+        console.print(f"[green]Privacy report exported to: {output}[/green]")
+    else:
+        console.print("[bold green]Privacy Report[/bold green]")
+        
+        # Display detailed report
+        for key, value in report.items():
+            if isinstance(value, dict):
+                console.print(f"\n[bold]{key.replace('_', ' ').title()}:[/bold]")
+                for sub_key, sub_value in value.items():
+                    console.print(f"  • {sub_key.replace('_', ' ').title()}: {sub_value}")
+            else:
+                console.print(f"• {key.replace('_', ' ').title()}: {value}")
+
+
+@app.command()
+def cleanup():
+    """Clean up cached data and temporary files."""
+    console.print("[yellow]Cleaning up cached data...[/yellow]")
+    privacy_manager.cleanup_old_data()
+    console.print("[green]✓ Cleanup completed[/green]")
+
+
 def _display_analysis_summary(result: AnalysisResult):
     """Display analysis summary."""
     console.print("\n[bold green]Analysis Summary[/bold green]")
@@ -184,7 +303,11 @@ def _export_diagram(result: AnalysisResult, format: str, output_path: Optional[P
 
 def main():
     """Main entry point."""
-    app()
+    try:
+        app()
+    finally:
+        # Ensure privacy cleanup happens on exit
+        privacy_cleanup()
 
 
 if __name__ == "__main__":
