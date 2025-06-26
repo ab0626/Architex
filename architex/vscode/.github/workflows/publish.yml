@@ -1,0 +1,92 @@
+name: Publish VS Code Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: architex/vscode/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd architex/vscode
+        npm ci
+        
+    - name: Compile TypeScript
+      run: |
+        cd architex/vscode
+        npm run compile
+        
+    - name: Package extension
+      run: |
+        cd architex/vscode
+        npx @vscode/vsce package
+        
+    - name: Publish to VS Code Marketplace
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        cd architex/vscode
+        npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }}
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        
+    - name: Upload extension package
+      uses: actions/upload-artifact@v4
+      with:
+        name: architex-extension
+        path: architex/vscode/*.vsix
+        
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Architex VS Code Extension ${{ github.ref_name }}
+        body: |
+          ## What's New in ${{ github.ref_name }}
+          
+          ### Features
+          - AI-powered architecture analysis
+          - Multi-language support (Python, JavaScript, TypeScript, Java)
+          - Interactive dashboard with real-time updates
+          - Live file watching and analysis
+          - Export capabilities (Mermaid, PlantUML, Graphviz)
+          
+          ### Installation
+          1. Open VS Code
+          2. Go to Extensions (Ctrl+Shift+X)
+          3. Search for "Architex"
+          4. Click Install
+          
+          ### Usage
+          1. Open a workspace with your codebase
+          2. Press Ctrl+Shift+P and run "Architex: Analyze Current Workspace"
+          3. View results in the Architex sidebar
+          
+          ### Documentation
+          - [GitHub Repository](https://github.com/ab0626/Architex)
+          - [Full Documentation](https://github.com/ab0626/Architex/blob/main/README.md)
+          
+          ### Support
+          - [Report Issues](https://github.com/ab0626/Architex/issues)
+          - [Feature Requests](https://github.com/ab0626/Architex/issues/new)
+        draft: false
+        prerelease: false 
