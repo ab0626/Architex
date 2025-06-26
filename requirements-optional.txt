@@ -1,0 +1,57 @@
+# Optional dependencies that may need special installation
+
+# Mermaid CLI (install via npm instead of pip)
+# npm install -g @mermaid-js/mermaid-cli
+
+# PlantUML (requires Java)
+# Download from: https://plantuml.com/download
+
+# Graphviz (system dependency)
+# Windows: Download from https://graphviz.org/download/
+# macOS: brew install graphviz
+# Ubuntu: sudo apt-get install graphviz
+
+# Language-specific parsers (optional)
+# tree-sitter-python
+# tree-sitter-javascript
+# tree-sitter-java
+# tree-sitter-go
+# tree-sitter-rust
+
+# Development tools
+jupyter>=1.0.0
+ipython>=8.0.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+
+# Additional visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Additional AI/ML
+scikit-learn>=1.3.0
+torch>=2.0.0
+tensorflow>=2.13.0
+
+# Additional web frameworks
+django>=4.2.0
+flask>=2.3.0
+
+# Additional databases
+pymongo>=4.5.0
+psycopg2-binary>=2.9.0
+mysql-connector-python>=8.1.0
+
+# Additional monitoring
+sentry-sdk>=1.35.0
+newrelic>=9.0.0
+
+# Additional testing
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+pytest-xdist>=3.3.0
+
+# Additional documentation
+sphinx>=7.0.0
+sphinx-rtd-theme>=1.3.0 

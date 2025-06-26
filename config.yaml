@@ -1,0 +1,287 @@
+# Architex Configuration File
+# This file configures all aspects of the Architex system design analyzer
+
+# Core Analysis Settings
+analysis:
+  # Maximum depth for dependency analysis
+  max_depth: 10
+  
+  # File patterns to ignore during analysis
+  ignore_patterns:
+    - "__pycache__"
+    - "node_modules"
+    - ".git"
+    - ".svn"
+    - ".hg"
+    - "*.pyc"
+    - "*.pyo"
+    - "*.pyd"
+    - "*.so"
+    - "*.dll"
+    - "*.dylib"
+    - "*.exe"
+    - "*.class"
+    - "*.jar"
+    - "*.war"
+    - "*.ear"
+    - "*.min.js"
+    - "*.min.css"
+    - "dist"
+    - "build"
+    - "target"
+    - "coverage"
+    - ".pytest_cache"
+    - ".mypy_cache"
+  
+  # Supported programming languages
+  supported_languages:
+    - python
+    - javascript
+    - typescript
+    - java
+    - cpp
+    - c
+    - go
+    - rust
+    - php
+    - ruby
+
+# AI Features Configuration
+ai:
+  # Enable/disable AI features
+  enabled: true
+  
+  # Language model configuration
+  llm:
+    # Primary model provider (openai, anthropic, local)
+    provider: "openai"
+    
+    # Model names for different providers
+    models:
+      openai: "gpt-4"
+      anthropic: "claude-3-sonnet-20240229"
+      local: "llama2-7b"
+    
+    # Temperature for generation (0.0 = deterministic, 1.0 = creative)
+    temperature: 0.1
+    
+    # Maximum tokens for responses
+    max_tokens: 1000
+    
+    # Timeout for API calls (seconds)
+    timeout: 30
+  
+  # Component labeling settings
+  labeling:
+    enabled: true
+    confidence_threshold: 0.7
+    cache_responses: true
+    max_context_length: 1000
+  
+  # Module summarization settings
+  summarization:
+    enabled: true
+    include_recommendations: true
+    max_summary_length: 500
+  
+  # Service boundary detection
+  service_boundaries:
+    enabled: true
+    min_boundary_size: 3
+    max_boundary_size: 50
+
+# Live Analysis Configuration
+live:
+  # Enable file watching
+  file_watching:
+    enabled: true
+    
+    # Debounce delay for file changes (seconds)
+    debounce_delay: 2.0
+    
+    # File extensions to watch
+    extensions:
+      - ".py"
+      - ".js"
+      - ".ts"
+      - ".java"
+      - ".cpp"
+      - ".c"
+      - ".h"
+      - ".go"
+      - ".rs"
+      - ".php"
+      - ".rb"
+  
+  # WebSocket server configuration
+  websocket:
+    enabled: true
+    host: "localhost"
+    port: 8765
+    max_clients: 100
+  
+  # Incremental analysis settings
+  incremental:
+    enabled: true
+    batch_size: 10
+    max_concurrent_analyses: 4
+
+# Export Configuration
+export:
+  # Default export format
+  default_format: "mermaid"
+  
+  # Available export formats
+  formats:
+    mermaid:
+      enabled: true
+      diagram_type: "graph"  # graph, flowchart, classDiagram
+      theme: "default"
+    
+    plantuml:
+      enabled: true
+      diagram_type: "component"  # component, class, package
+      theme: "plain"
+    
+    graphviz:
+      enabled: true
+      layout_engine: "dot"  # dot, neato, fdp, sfdp, twopi, circo
+      output_format: "svg"  # svg, png, pdf, dot
+  
+  # Output settings
+  output:
+    include_metadata: true
+    include_ai_labels: true
+    include_summaries: true
+    group_by_module: true
+
+# Visualization Settings
+visualization:
+  # Color schemes for different element types
+  colors:
+    module: "#e1f5fe"
+    class: "#f3e5f5"
+    function: "#e8f5e8"
+    method: "#fff3e0"
+    variable: "#fce4ec"
+    import: "#f1f8e9"
+    package: "#e0f2f1"
+    interface: "#fafafa"
+    enum: "#fff8e1"
+    struct: "#f9fbe7"
+    namespace: "#f5f5f5"
+  
+  # Relationship styles
+  relationships:
+    inherits: "solid"
+    implements: "dashed"
+    depends_on: "dotted"
+    imports: "solid"
+    calls: "solid"
+    uses: "dashed"
+    contains: "solid"
+    associates: "dotted"
+    composes: "solid"
+    aggregates: "dashed"
+
+# Performance Configuration
+performance:
+  # Parallel processing settings
+  parallel:
+    enabled: true
+    max_workers: 4
+    chunk_size: 100
+  
+  # Caching settings
+  caching:
+    enabled: true
+    cache_dir: ".architex_cache"
+    max_cache_size: "1GB"
+    cache_ttl: 3600  # seconds
+  
+  # Memory management
+  memory:
+    max_memory_usage: "2GB"
+    gc_threshold: 1000
+
+# Database Configuration (for advanced features)
+database:
+  # Enable database storage for analysis results
+  enabled: false
+  
+  # Database type (sqlite, postgresql, mysql)
+  type: "sqlite"
+  
+  # Connection settings
+  connection:
+    host: "localhost"
+    port: 5432
+    database: "architex"
+    username: ""
+    password: ""
+  
+  # Migration settings
+  migrations:
+    auto_migrate: true
+    backup_before_migrate: true
+
+# Monitoring and Logging
+monitoring:
+  # Enable metrics collection
+  metrics:
+    enabled: true
+    prometheus_port: 9090
+  
+  # Logging configuration
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    format: "json"
+    output: "console"  # console, file, syslog
+    
+    # File logging settings
+    file:
+      enabled: false
+      path: "architex.log"
+      max_size: "10MB"
+      backup_count: 5
+
+# Security Settings
+security:
+  # Input validation
+  validation:
+    max_file_size: "10MB"
+    allowed_file_types:
+      - ".py"
+      - ".js"
+      - ".ts"
+      - ".java"
+      - ".cpp"
+      - ".c"
+      - ".h"
+      - ".go"
+      - ".rs"
+      - ".php"
+      - ".rb"
+  
+  # API security
+  api:
+    rate_limit: 100  # requests per minute
+    require_authentication: false
+    cors_origins: ["*"]
+
+# Development Settings
+development:
+  # Debug mode
+  debug: false
+  
+  # Development features
+  features:
+    hot_reload: true
+    verbose_output: false
+    mock_ai_responses: false
+  
+  # Testing configuration
+  testing:
+    use_mock_llm: true
+    test_data_dir: "test_data"
+    coverage_threshold: 80 

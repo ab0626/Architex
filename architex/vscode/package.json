@@ -1,0 +1,262 @@
+{
+  "name": "architex",
+  "displayName": "Architex - AI-Powered Architecture Analysis",
+  "description": "Automatically generate system design diagrams and architectural insights from your codebase using AI",
+  "version": "1.0.0",
+  "publisher": "architex",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization",
+    "AI"
+  ],
+  "keywords": [
+    "architecture",
+    "diagrams",
+    "ai",
+    "system-design",
+    "code-analysis",
+    "visualization"
+  ],
+  "icon": "resources/icon.png",
+  "galleryBanner": {
+    "color": "#1e293b",
+    "theme": "dark"
+  },
+  "activationEvents": [
+    "onCommand:architex.analyze",
+    "onCommand:architex.showDashboard",
+    "onCommand:architex.showMetrics",
+    "onCommand:architex.showRecommendations",
+    "onCommand:architex.startLiveAnalysis",
+    "onView:architex.architectureView",
+    "onView:architex.metricsView",
+    "onView:architex.recommendationsView"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "architex.analyze",
+        "title": "Architex: Analyze Current Workspace",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.analyzeFile",
+        "title": "Architex: Analyze Current File",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.showDashboard",
+        "title": "Architex: Show Dashboard",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.showMetrics",
+        "title": "Architex: Show Metrics",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.showRecommendations",
+        "title": "Architex: Show AI Recommendations",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.startLiveAnalysis",
+        "title": "Architex: Start Live Analysis",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.stopLiveAnalysis",
+        "title": "Architex: Stop Live Analysis",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.exportDiagram",
+        "title": "Architex: Export Diagram",
+        "category": "Architex"
+      },
+      {
+        "command": "architex.exportSummary",
+        "title": "Architex: Export Analysis Summary",
+        "category": "Architex"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "architex.analyze",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "architex.analyzeFile",
+          "when": "activeTextEditor"
+        },
+        {
+          "command": "architex.showDashboard",
+          "when": "architex.hasAnalysis"
+        },
+        {
+          "command": "architex.showMetrics",
+          "when": "architex.hasAnalysis"
+        },
+        {
+          "command": "architex.showRecommendations",
+          "when": "architex.hasAnalysis"
+        },
+        {
+          "command": "architex.startLiveAnalysis",
+          "when": "workspaceFolderCount > 0 && !architex.liveAnalysisActive"
+        },
+        {
+          "command": "architex.stopLiveAnalysis",
+          "when": "architex.liveAnalysisActive"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "architex.analyzeFile",
+          "when": "resourceExtname == .py || resourceExtname == .js || resourceExtname == .java || resourceExtname == .ts",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "architex.analyze",
+          "when": "workspaceFolderCount > 0",
+          "group": "navigation"
+        }
+      ]
+    },
+    "views": {
+      "architex.architexContainer": [
+        {
+          "id": "architex.architectureView",
+          "name": "🏗️ Architecture",
+          "when": "architex.hasAnalysis"
+        },
+        {
+          "id": "architex.metricsView",
+          "name": "📊 Metrics",
+          "when": "architex.hasAnalysis"
+        },
+        {
+          "id": "architex.recommendationsView",
+          "name": "🎯 AI Recommendations",
+          "when": "architex.hasAnalysis"
+        },
+        {
+          "id": "architex.liveAnalysisView",
+          "name": "🔄 Live Analysis",
+          "when": "architex.liveAnalysisActive"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "architex.architexContainer",
+          "title": "Architex",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Architex",
+      "properties": {
+        "architex.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Architex analysis"
+        },
+        "architex.aiFeatures": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered features (labels, summaries, recommendations)"
+        },
+        "architex.liveAnalysis": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable live analysis with file watching"
+        },
+        "architex.websocketPort": {
+          "type": "number",
+          "default": 8765,
+          "description": "WebSocket server port for live updates"
+        },
+        "architex.dashboardPort": {
+          "type": "number",
+          "default": 8000,
+          "description": "Dashboard server port"
+        },
+        "architex.autoAnalyze": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically analyze workspace on startup"
+        },
+        "architex.exportFormat": {
+          "type": "string",
+          "enum": [
+            "mermaid",
+            "plantuml",
+            "graphviz"
+          ],
+          "default": "mermaid",
+          "description": "Default diagram export format"
+        },
+        "architex.summaryFormat": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "json"
+          ],
+          "default": "markdown",
+          "description": "Default summary export format"
+        }
+      }
+    },
+    "statusBar": {
+      "items": [
+        {
+          "id": "architex.status",
+          "name": "Architex Status",
+          "alignment": "left",
+          "priority": 100
+        }
+      ]
+    },
+    "webview": {
+      "panels": [
+        {
+          "id": "architex.dashboard",
+          "title": "Architex Dashboard",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vscode/test-electron": "^2.3.0",
+    "eslint": "^8.0.0",
+    "typescript": "^4.9.0"
+  },
+  "dependencies": {
+    "ws": "^8.13.0"
+  }
+}
