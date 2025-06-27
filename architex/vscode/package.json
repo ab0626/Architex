@@ -218,6 +218,11 @@
           ],
           "default": "markdown",
           "description": "Default summary export format"
+        },
+        "architex.architexPath": {
+          "type": "string",
+          "default": "architex",
+          "description": "Path to the Architex CLI executable (e.g., 'architex', 'python -m architex.cli.main', or full path)"
         }
       }
     },
