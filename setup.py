@@ -7,7 +7,11 @@ from pathlib import Path
 
 # Read the README file
 this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text()
+try:
+    long_description = (this_directory / "README.md").read_text(encoding='utf-8')
+except UnicodeDecodeError:
+    # Fallback to a simple description if README can't be read
+    long_description = "Automated System Design Diagram Generator"
 
 # Read requirements
 requirements = (this_directory / "requirements.txt").read_text().splitlines()

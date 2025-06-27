@@ -158,10 +158,52 @@ export class ArchitexExtension {
     }
   }
 
+  private getArchitexPath(): string {
+    const config = vscode.workspace.getConfiguration('architex');
+    const customPath = config.get('architexPath');
+    if (typeof customPath === 'string' && customPath.length > 0) {
+      return customPath;
+    }
+    
+    // Try to find architex in common locations
+    const possiblePaths = [
+      'architex',
+      'python -m architex.cli.main',
+      'python -m architex',
+      path.join(__dirname, '..', '..', '..', 'cli', 'main.py'),
+      path.join(__dirname, '..', '..', '..', '..', 'cli', 'main.py')
+    ];
+    
+    return possiblePaths[0]; // Start with the standard architex command
+  }
+
   private async runArchitexCommand(args: string[]): Promise<{ success: boolean; output: string; error: string }> {
     return new Promise((resolve) => {
       const architexPath = this.getArchitexPath();
-      const process = spawn(architexPath, args, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath });
+      
+      // Handle different command formats
+      let command: string;
+      let commandArgs: string[];
+      
+      if (architexPath.includes('python -m')) {
+        // Handle python module format
+        const parts = architexPath.split(' ');
+        command = parts[0];
+        commandArgs = [...parts.slice(1), ...args];
+      } else if (architexPath.endsWith('.py')) {
+        // Handle direct Python script
+        command = 'python';
+        commandArgs = [architexPath, ...args];
+      } else {
+        // Handle direct command
+        command = architexPath;
+        commandArgs = args;
+      }
+      
+      const process = spawn(command, commandArgs, { 
+        cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath,
+        shell: true // Use shell to handle command resolution
+      });
 
       let output = '';
       let error = '';
@@ -181,16 +223,15 @@ export class ArchitexExtension {
           error
         });
       });
-    });
-  }
 
-  private getArchitexPath(): string {
-    const config = vscode.workspace.getConfiguration('architex');
-    const customPath = config.get('architexPath');
-    if (typeof customPath === 'string' && customPath.length > 0) {
-      return customPath;
-    }
-    return 'python';
+      process.on('error', (err) => {
+        resolve({
+          success: false,
+          output: '',
+          error: `Failed to start architex: ${err.message}. Please ensure Architex is installed and accessible.`
+        });
+      });
+    });
   }
 
   private parseAnalysisResult(output: string): AnalysisResult {
